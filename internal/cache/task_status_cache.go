@@ -1,0 +1,35 @@
+package cache
+
+import (
+	"context"
+	"time"
+)
+
+type TaskStatusCache struct {
+	client any
+	ttl    time.Duration
+}
+
+func NewTaskStatusCache(client any, ttlSeconds int64) *TaskStatusCache {
+	if ttlSeconds <= 0 {
+		ttlSeconds = 1800
+	}
+	return &TaskStatusCache{
+		client: client,
+		ttl:    time.Duration(ttlSeconds) * time.Second,
+	}
+}
+
+func (c *TaskStatusCache) Get(ctx context.Context, taskID string) (string, bool, error) {
+	// TODO: 查询 Redis key: task:status:{task_id}。
+	return "", false, nil
+}
+
+func (c *TaskStatusCache) Set(ctx context.Context, taskID string, status string) error {
+	// TODO: 写入 Redis key: task:status:{task_id}，并设置 c.ttl。
+	return nil
+}
+
+func TaskStatusKey(taskID string) string {
+	return "task:status:" + taskID
+}

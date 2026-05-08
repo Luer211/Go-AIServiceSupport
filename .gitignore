@@ -1,0 +1,48 @@
+# Go build output
+/bin/
+/dist/
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go test / coverage
+*.out
+coverage.*
+coverage.html
+
+# Go workspace / local env
+go.work
+go.work.sum
+.env
+.env.*
+!.env.example
+
+# Local config with real secrets
+config/*.local.yaml
+config/*-local.yaml
+config/application-release.yaml
+
+# Logs
+*.log
+logs/
+logger/logs/
+
+# Runtime / temp files
+tmp/
+temp/
+.cache/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
