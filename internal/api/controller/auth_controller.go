@@ -19,13 +19,16 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 	return &AuthController{authService: authService}
 }
 
+// 用户注册接口
 func (ctl *AuthController) Register(ctx *gin.Context) {
+	// 绑定并校验前端传入的 JSON 注册请求参数
 	var req request.RegisterRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		common.Fail(ctx, e.CodeInvalidParams)
 		return
 	}
 
+	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Register(ctx.Request.Context(), req)
 	if err != nil {
 		common.FailWithMessage(ctx, e.CodeInternalError, err.Error())
@@ -35,13 +38,16 @@ func (ctl *AuthController) Register(ctx *gin.Context) {
 	common.Success(ctx, resp)
 }
 
+// 用户登录接口
 func (ctl *AuthController) Login(ctx *gin.Context) {
+	// 绑定并校验前端传入的 JSON 注册请求参数
 	var req request.LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		common.Fail(ctx, e.CodeInvalidParams)
 		return
 	}
 
+	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Login(ctx.Request.Context(), req)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidLogin) {

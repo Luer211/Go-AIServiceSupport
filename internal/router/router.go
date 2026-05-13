@@ -17,7 +17,7 @@ import (
 func InitRouter() *gin.Engine {
 	r := gin.Default()
 
-	// 未加入日志中间件
+	// Todo: 加入日志中间件
 
 	cfg := global.AppConfig()
 	producer := global.TaskProducer
