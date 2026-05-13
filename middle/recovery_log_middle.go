@@ -1,1 +1,2 @@
 // “兜底防崩溃”的中间件，panic 保护层
+package middle

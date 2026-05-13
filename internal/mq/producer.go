@@ -14,5 +14,6 @@ func NewNoopProducer() Producer {
 
 func (p *NoopProducer) PublishTask(ctx context.Context, message TaskMessage) error {
 	// TODO: 替换为真实 MQ 投递逻辑。
+	// 先投递，然后更新数据库的任务状态为running
 	return nil
 }
