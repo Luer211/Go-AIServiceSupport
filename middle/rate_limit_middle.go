@@ -10,6 +10,7 @@ import (
 	"Go-AIServiceSupport/internal/cache"
 )
 
+// Todo：限流中间件的实现
 func RateLimit(limiter *cache.RateLimiter, ipLimit int, userLimit int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if limiter == nil {
@@ -17,6 +18,7 @@ func RateLimit(limiter *cache.RateLimiter, ipLimit int, userLimit int) gin.Handl
 			return
 		}
 
+		// IP 限流
 		allowed, err := limiter.Allow(c.Request.Context(), cache.IPRateKey(c.ClientIP()), ipLimit)
 		if err != nil {
 			common.FailWithMessage(c, e.CodeInternalError, err.Error())
@@ -29,6 +31,7 @@ func RateLimit(limiter *cache.RateLimiter, ipLimit int, userLimit int) gin.Handl
 			return
 		}
 
+		// 用户ID 限流
 		userID := CurrentUserID(c)
 		if userID != 0 {
 			allowed, err = limiter.Allow(c.Request.Context(), cache.UserRateKey(strconv.FormatUint(userID, 10)), userLimit)

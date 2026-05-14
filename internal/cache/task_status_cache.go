@@ -22,16 +22,19 @@ func NewTaskStatusCache(client *redis.Client, ttlSeconds int64) *TaskStatusCache
 	}
 }
 
+// 根据 key 获取 value
 func (c *TaskStatusCache) Get(ctx context.Context, taskID string) (string, bool, error) {
 	// TODO: 查询 Redis key: task:status:{task_id}。
 	return "", false, nil
 }
 
+// 设置 key-value
 func (c *TaskStatusCache) Set(ctx context.Context, taskID string, status string) error {
 	// TODO: 写入 Redis key: task:status:{task_id}，并设置 c.ttl。
 	return nil
 }
 
+// 生成 Redis key 的辅助函数
 func TaskStatusKey(taskID string) string {
 	return "task:status:" + taskID
 }
