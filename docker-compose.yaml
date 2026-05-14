@@ -1,3 +1,4 @@
+# Todo: 要改成真正的库名和密码
 services:
   mysql:
     image: mysql:8.0

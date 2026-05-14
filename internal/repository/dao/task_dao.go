@@ -4,27 +4,36 @@ import (
 	"context"
 
 	"Go-AIServiceSupport/internal/model"
+
+	"gorm.io/gorm"
 )
 
 type TaskDao struct {
-	db any
+	db *gorm.DB
 }
 
-func NewTaskDao(db any) *TaskDao {
+func NewTaskDao(db *gorm.DB) *TaskDao {
 	return &TaskDao{db: db}
 }
 
+// 把任务写入 tasks 表。
 func (d *TaskDao) Create(ctx context.Context, task *model.Task) error {
-	// TODO: 使用 GORM 写入 tasks 表。
-	return ErrNotImplemented
+	return d.db.WithContext(ctx).Create(task).Error
 }
 
+// 按 task_id 查询任务，并用于校验任务归属
 func (d *TaskDao) FindByTaskID(ctx context.Context, taskID string) (*model.Task, error) {
-	// TODO: 使用 GORM 按 task_id 查询任务，并用于校验任务归属。
-	return nil, ErrNotImplemented
+	var task model.Task
+	if err := d.db.WithContext(ctx).
+		Where("task_id = ?", taskID).
+		First(&task).Error; err != nil {
+			return nil, err
+		}
+	return &task, nil
 }
 
+// 消费端完成任务后更新 MySQL 状态和结果
 func (d *TaskDao) UpdateStatus(ctx context.Context, taskID string, status string, result string) error {
-	// TODO: 消费端完成任务后更新 MySQL 状态和结果。
+	// Todo: 消费端完成任务后更新 MySQL 状态和结果
 	return ErrNotImplemented
 }

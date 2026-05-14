@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitGorm(cfg *config.Config) any {
+func InitGorm(cfg *config.Config) *gorm.DB {
 	// TODO: 我们这里的错误处理尚未接入全局日志
 	db, err := gorm.Open(mysql.Open(cfg.MySQL.DSN), &gorm.Config{})
 	if err != nil {

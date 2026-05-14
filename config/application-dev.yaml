@@ -1,6 +1,7 @@
 server:
   port: 8080
 
+# Todo: 要改成真正的库名和密码
 mysql:
   dsn: "user:password@tcp(127.0.0.1:3306)/ai_task?charset=utf8mb4&parseTime=True&loc=Local"
 

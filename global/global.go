@@ -4,12 +4,14 @@ import (
 	"Go-AIServiceSupport/config"
 	"Go-AIServiceSupport/internal/mq"
 	"Go-AIServiceSupport/logger"
+
+	"gorm.io/gorm"
 )
 
 // Todo: 这里要明确一下，我们已经严肃设计了DB和Redis了，就不应该是any了
 var (
 	Config       *config.Config
-	DB           any
+	DB           *gorm.DB
 	Redis        any
 	Log          logger.Logger
 	TaskProducer mq.Producer

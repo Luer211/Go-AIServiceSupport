@@ -4,22 +4,30 @@ import (
 	"context"
 
 	"Go-AIServiceSupport/internal/model"
+
+	"gorm.io/gorm"
 )
 
 type UserDao struct {
-	db any
+	db *gorm.DB
 }
 
-func NewUserDao(db any) *UserDao {
+func NewUserDao(db *gorm.DB) *UserDao {
 	return &UserDao{db: db}
 }
 
+// 创建新用户
 func (d *UserDao) Create(ctx context.Context, user *model.User) error {
-	// TODO: 使用 GORM 写入 users 表。
-	return ErrNotImplemented
+	return d.db.WithContext(ctx).Create(user).Error
 }
 
+// 按照用户名称查询用户
 func (d *UserDao) FindByUsername(ctx context.Context, username string) (*model.User, error) {
-	// TODO: 使用 GORM 按 username 查询用户。
-	return nil, ErrNotImplemented
+	var user model.User
+	if err := d.db.WithContext(ctx).
+		Where("username = ?", username).
+		First(&user).Error; err != nil {
+			return nil, err
+		}
+	return &user, nil
 }
