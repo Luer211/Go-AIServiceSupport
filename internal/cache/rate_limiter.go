@@ -3,14 +3,16 @@ package cache
 import (
 	"context"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type RateLimiter struct {
-	client any
+	client *redis.Client
 	window time.Duration
 }
 
-func NewRateLimiter(client any, window time.Duration) *RateLimiter {
+func NewRateLimiter(client *redis.Client, window time.Duration) *RateLimiter {
 	if window <= 0 {
 		window = time.Minute
 	}

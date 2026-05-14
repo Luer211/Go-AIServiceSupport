@@ -5,6 +5,7 @@ import (
 	"Go-AIServiceSupport/internal/mq"
 	"Go-AIServiceSupport/logger"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +13,7 @@ import (
 var (
 	Config       *config.Config
 	DB           *gorm.DB
-	Redis        any
+	Redis        *redis.Client
 	Log          logger.Logger
 	TaskProducer mq.Producer
 )

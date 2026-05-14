@@ -3,14 +3,16 @@ package cache
 import (
 	"context"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type TaskStatusCache struct {
-	client any
+	client *redis.Client
 	ttl    time.Duration
 }
 
-func NewTaskStatusCache(client any, ttlSeconds int64) *TaskStatusCache {
+func NewTaskStatusCache(client *redis.Client, ttlSeconds int64) *TaskStatusCache {
 	if ttlSeconds <= 0 {
 		ttlSeconds = 1800
 	}
