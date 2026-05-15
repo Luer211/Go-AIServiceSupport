@@ -45,7 +45,11 @@ type TaskConfig struct {
 }
 
 type MQConfig struct {
-	MaxRetry int `mapstructure:"max_retry"`
+	URL        string `mapstructure:"url"`
+	Exchange   string `mapstructure:"exchange"`
+	Queue      string `mapstructure:"queue"`
+	RoutingKey string `mapstructure:"routing_key"`
+	MaxRetry   int    `mapstructure:"max_retry"`
 }
 
 // 使用 Viper 从 yaml 中读取配置
@@ -91,6 +95,18 @@ func (c *Config) Validate() error {
 	}
 	if c.Redis.Addr == "" {
 		return fmt.Errorf("redis.addr is required")
+	}
+	if c.MQ.URL == "" {
+	return fmt.Errorf("mq.url is required")
+	}
+	if c.MQ.Exchange == "" {
+		return fmt.Errorf("mq.exchange is required")
+	}
+	if c.MQ.Queue == "" {
+		return fmt.Errorf("mq.queue is required")
+	}
+	if c.MQ.RoutingKey == "" {
+		return fmt.Errorf("mq.routing_key is required")
 	}
 	if c.MQ.MaxRetry < 0 {
 		return fmt.Errorf("mq.max_retry must be non-negative")

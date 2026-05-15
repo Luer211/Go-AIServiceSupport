@@ -30,7 +30,22 @@ services:
     volumes:
       - redis_data:/data
 
-# 声明使用了两个挂载卷
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: go-ai-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+      RABBITMQ_DEFAULT_VHOST: ai_task
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+# 声明使用了三个挂载卷
 volumes:
   mysql_data:
   redis_data:
+  rabbitmq_data:

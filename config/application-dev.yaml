@@ -2,6 +2,7 @@ server:
   port: 8080
 
 # Todo: 要改成真正的库名和密码
+
 mysql:
   dsn: "user:password@tcp(127.0.0.1:3306)/ai_task?charset=utf8mb4&parseTime=True&loc=Local"
 
@@ -22,4 +23,8 @@ task:
   redis_status_ttl_seconds: 1800
 
 mq:
+  url: "amqp://user:password@127.0.0.1:5672/ai_task"
+  exchange: "ai.task.exchange"
+  queue: "ai.task.queue"
+  routing_key: "ai.task.create"
   max_retry: 3

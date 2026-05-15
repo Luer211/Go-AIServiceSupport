@@ -6,7 +6,16 @@ import (
 )
 
 func InitMQ(cfg *config.Config) mq.Producer {
-	// TODO: 替换成真实 MQ producer，例如 RabbitMQ/Kafka/Redis Stream。
-	// 我们这里选择的是 RabbitMQ
-	return mq.NewNoopProducer()
+	producer, err := mq.NewRabbitMQProducer(
+		cfg.MQ.URL,
+		cfg.MQ.Exchange,
+		cfg.MQ.Queue,
+		cfg.MQ.RoutingKey,
+	)
+	// Todo：这里应该要报错
+	if err != nil {
+		return nil
+	}
+
+	return producer
 }

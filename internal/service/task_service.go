@@ -25,9 +25,10 @@ type TaskService struct {
 	producer    mq.Producer
 }
 
+// Todo：这里的错误处理
 func NewTaskService(tasks *dao.TaskDao, statusCache *cache.TaskStatusCache, producer mq.Producer) *TaskService {
 	if producer == nil {
-		producer = mq.NewNoopProducer()
+		panic("task producer not initialized")
 	}
 	return &TaskService{
 		tasks:       tasks,

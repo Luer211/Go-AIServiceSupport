@@ -8,7 +8,6 @@ import (
 	"Go-AIServiceSupport/global"
 	"Go-AIServiceSupport/internal/api/controller"
 	"Go-AIServiceSupport/internal/cache"
-	"Go-AIServiceSupport/internal/mq"
 	"Go-AIServiceSupport/internal/repository/dao"
 	"Go-AIServiceSupport/internal/service"
 	"Go-AIServiceSupport/middle"
@@ -22,7 +21,7 @@ func InitRouter() *gin.Engine {
 	cfg := global.AppConfig()
 	producer := global.TaskProducer
 	if producer == nil {
-		producer = mq.NewNoopProducer()
+		panic("task producer not initialized")
 	}
 
 	userDao := dao.NewUserDao(global.DB)
