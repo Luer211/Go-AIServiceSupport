@@ -10,7 +10,7 @@ import (
 	"Go-AIServiceSupport/internal/cache"
 )
 
-// Todo：限流中间件的实现
+// Todo：全局错误的实现
 func RateLimit(limiter *cache.RateLimiter, ipLimit int, userLimit int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if limiter == nil {

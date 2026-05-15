@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -24,14 +25,31 @@ func NewTaskStatusCache(client *redis.Client, ttlSeconds int64) *TaskStatusCache
 
 // 根据 key 获取 value
 func (c *TaskStatusCache) Get(ctx context.Context, taskID string) (string, bool, error) {
-	// TODO: 查询 Redis key: task:status:{task_id}。
-	return "", false, nil
+	if c == nil || c.client == nil {
+		return "", false, nil
+	}
+
+	status, err := c.client.Get(ctx, TaskStatusKey(taskID)).Result()
+	if err != nil {
+		// key 不存在
+		if errors.Is(err, redis.Nil) {
+			return "", false, nil
+		}
+		// 其他错误
+		return "", false, err
+	}
+
+	return status, true, nil
 }
 
-// 设置 key-value
+// 设置 key-value 写入 Redis，并设置过期时间
 func (c *TaskStatusCache) Set(ctx context.Context, taskID string, status string) error {
-	// TODO: 写入 Redis key: task:status:{task_id}，并设置 c.ttl。
-	return nil
+	if c == nil || c.client ==nil {
+		return nil
+	}
+
+	// Todo: 这里的错误可以变成统一错误处理
+	return c.client.Set(ctx, TaskStatusKey(taskID), status, c.ttl).Err()
 }
 
 // 生成 Redis key 的辅助函数

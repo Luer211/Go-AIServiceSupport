@@ -22,6 +22,7 @@ func InitRedis(cfg *config.Config) *redis.Client {
 	defer cancel()
 
 	// Todo: 这里使用 panic，暂时还没纳入统一错误处理
+	// Ping 一下
 	if err := client.Ping(ctx).Err(); err != nil {
 		panic(err)
 	}
