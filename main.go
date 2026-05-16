@@ -14,6 +14,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// 日志的退出同步
+	defer func() {
+		if global.Log != nil {
+			_ = global.Log.Sync()
+		}
+	}()
+
 	// 初始化路由
 	r := router.InitRouter()
 	if err := r.Run(":" + global.AppConfig().Server.Port); err != nil {
