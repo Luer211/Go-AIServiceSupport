@@ -76,7 +76,7 @@ GO-AIServiceSupport/
 │   ├── api-design.md            # HTTP API 设计
 │   └── roadmap-and-tech-debt.md # MVP 边界与后续技术债与迭代
 ├── main.go                      
-├── docker-compose.yaml          # 🐳 容器编排 (MySQL + Redis + App)
+├── docker-compose.yaml          # 🐳 容器编排 (MySQL + Redis + RabbitMQ)
 │
 ├── config/                      # ⚙️ 配置管理
 │   ├── application-dev.yaml     #    开发环境配置
