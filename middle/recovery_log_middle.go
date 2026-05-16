@@ -21,9 +21,10 @@ func RecoveryLog() gin.HandlerFunc {
 					zap.String("method", c.Request.Method),
 					zap.String("path", c.Request.URL.Path),
 					zap.String("client_ip", c.ClientIP()),
-					zap.ByteString("stack", debug.Stack()),
+					zap.ByteString("stack", debug.Stack()), // 崩溃堆栈（定位代码用）
 				)
 
+				// 返回错误给前端
 				common.Fail(c, e.CodeInternalError)
 				c.Abort()
 			}
