@@ -33,7 +33,7 @@ flowchart LR
         Init --> RedisClient["Redis Client"]
         Init --> MQProducer["RabbitMQ Producer"]
 
-        API --> MW["Middleware<br/>JWT 鉴权 + Redis 限流"]
+        API --> MW["Middleware<br/>JWT 鉴权 + Redis 限流 + 日志"]
         MW --> Router["Router<br/>/auth /tasks"]
 
         Router --> AuthCtl["AuthController"]
