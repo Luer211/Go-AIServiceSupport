@@ -16,7 +16,54 @@
 - 接口统一使用响应结构和错误码规范。
 
 
-## 2. 项目目录架构
+
+## 2. 项目架构图
+
+```mermaid
+flowchart LR
+    U["用户 / 前端"] -->|"HTTP JSON"| API["Gin API 服务<br/>/api/v1"]
+
+    subgraph App["Go-AIServiceSupport 后端服务"]
+        direction TB
+
+        Main["main.go"] --> Init["GlobalInit()"]
+        Init --> Config["Viper 配置<br/>application-dev.yaml"]
+        Init --> Logger["Zap Logger"]
+        Init --> Gorm["GORM MySQL Client"]
+        Init --> RedisClient["Redis Client"]
+        Init --> MQProducer["RabbitMQ Producer"]
+
+        API --> MW["Middleware<br/>JWT 鉴权 + Redis 限流"]
+        MW --> Router["Router<br/>/auth /tasks"]
+
+        Router --> AuthCtl["AuthController"]
+        Router --> TaskCtl["TaskController"]
+
+        AuthCtl --> AuthSvc["AuthService<br/>注册 / 登录 / JWT"]
+        TaskCtl --> TaskSvc["TaskService<br/>创建任务 / 查询状态"]
+
+        AuthSvc --> UserDao["UserDao"]
+        TaskSvc --> TaskDao["TaskDao"]
+        TaskSvc --> StatusCache["TaskStatusCache"]
+        TaskSvc --> MQProducer
+    end
+
+    UserDao --> MySQL[("MySQL<br/>users")]
+    TaskDao --> MySQL2[("MySQL<br/>tasks")]
+    StatusCache --> Redis[("Redis<br/>task:status:{task_id}")]
+    MW --> Redis2[("Redis<br/>rate:ip:* / rate:user:*")]
+
+    MQProducer --> RabbitMQ[("RabbitMQ<br/>exchange: ai.task.exchange<br/>queue: ai.task.queue")]
+
+    RabbitMQ -.-> Consumer["Task Consumer<br/>异步消费任务"]
+    Consumer -.-> AI["AI 服务"]
+    Consumer -.-> MySQL2
+    Consumer -.-> Redis
+```
+
+
+
+## 3. 项目目录架构
 
 ```text
 GO-AIServiceSupport/
