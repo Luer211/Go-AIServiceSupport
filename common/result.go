@@ -24,18 +24,30 @@ func Success(c *gin.Context, data interface{}) {
 	})
 }
 
-// 失败响应：使用预设错误码
-func Fail(c *gin.Context, code int) {
-	c.JSON(http.StatusOK, Response{
-		Code:    code,
-		Message: e.Message(code),
+// 失败响应
+func Error(c *gin.Context, err error) {
+	// 假如是定义的AppError的话
+	if appErr, ok := AsAppError(err); ok {
+		c.JSON(appErr.HTTPStatus, Response{
+			Code: 	 appErr.Code,
+			Message: appErr.Message,
+		})
+		return
+	}
+
+	// 假如是普通的error的话
+	c.JSON(http.StatusInternalServerError, Response{
+		Code: 	 e.CodeInternalError,
+		Message: e.Message(e.CodeInternalError),
 	})
 }
 
-// 失败响应：自定义错误信息
+// 控制层发生错误的话用Fail和FailWithMessage
+
+func Fail(c *gin.Context, code int) {
+	Error(c, NewAppError(code))
+}
+
 func FailWithMessage(c *gin.Context, code int, message string) {
-	c.JSON(http.StatusOK, Response{
-		Code:    code,
-		Message: message,
-	})
+	Error(c, NewAppErrorWithMessage(code, message))
 }

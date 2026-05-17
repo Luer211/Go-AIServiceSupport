@@ -31,6 +31,25 @@ var messages = map[int]string{
 	CodeInternalError:    "internal error",
 }
 
+func HTTPStatus(code int) int {
+	switch code {
+	case CodeInvalidParams, CodeUserExists, CodeInvalidLogin:
+		return 400
+	case CodeUnauthorized:
+		return 401
+	case CodeForbidden:
+		return 403
+	case CodeNotFound, CodeTaskNotFound:
+		return 404
+	case CodeTooManyReq:
+		return 429
+	case CodeInternalError, CodeTaskSubmitFailed:
+		return 500
+	default:
+		return 500
+	}
+}
+
 func Message(code int) string {
 	if msg, ok := messages[code]; ok {
 		return msg
