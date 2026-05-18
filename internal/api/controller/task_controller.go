@@ -24,7 +24,7 @@ func NewTaskController(taskService *service.TaskService) *TaskController {
 func (ctl *TaskController) CreateTask(ctx *gin.Context) {
 	var req request.CreateTaskRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		common.Fail(ctx, e.CodeInvalidParams)
+		common.Error(ctx, err)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (ctl *TaskController) GetTaskStatus(ctx *gin.Context) {
 	if err != nil {
 		// 判断是否为无权限访问错误，若是则返回权限不足响应
 		if errors.Is(err, service.ErrTaskForbidden) {
-			common.Fail(ctx, e.CodeForbidden)
+			common.Error(ctx, err)
 			return
 		}
 		// 其他错误（如任务不存在），返回任务未找到响应

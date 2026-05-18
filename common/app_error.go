@@ -13,6 +13,7 @@ type AppError struct {
 	Cause      error
 }
 
+//Todo: 这个似乎是不会被使用的。实现了接口而已。
 func (err *AppError) Error() string {
 	if err.Cause != nil {
 		return  err.Cause.Error()
@@ -34,7 +35,7 @@ func NewAppError(code int) *AppError {
 func NewAppErrorWithMessage(code int, message string) *AppError {
 	return &AppError{
 		Code: 		code,
-		Message:    e.Message(code),
+		Message:    message,
 		HTTPStatus: e.HTTPStatus(code),
 	}
 }
@@ -50,6 +51,7 @@ func WrapAppError(code int, cause error) *AppError {
 		Code: 		code,
 		Message:    e.Message(code),
 		HTTPStatus: e.HTTPStatus(code),
+		Cause: 		cause,
 	}
 }
 

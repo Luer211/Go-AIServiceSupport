@@ -51,7 +51,7 @@ func (ctl *AuthController) Login(ctx *gin.Context) {
 	resp, err := ctl.authService.Login(ctx.Request.Context(), req)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidLogin) {
-			common.Fail(ctx, e.CodeInvalidLogin)
+			common.Error(ctx, err)
 			return
 		}
 		common.FailWithMessage(ctx, e.CodeInternalError, err.Error())

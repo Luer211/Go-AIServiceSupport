@@ -4,11 +4,15 @@ import (
 	"context"
 	"errors"
 
+	"Go-AIServiceSupport/common"
+	"Go-AIServiceSupport/common/e"
 	"Go-AIServiceSupport/common/utils"
 	"Go-AIServiceSupport/internal/api/request"
 	"Go-AIServiceSupport/internal/api/response"
 	"Go-AIServiceSupport/internal/model"
 	"Go-AIServiceSupport/internal/repository/dao"
+
+	"gorm.io/gorm"
 )
 
 // 全局错误变量：用户名不存在/密码错误 时返回这个错误
@@ -59,18 +63,21 @@ func (s *AuthService) Login(ctx context.Context, req request.LoginRequest) (*res
 	// 根据用户名查询用户
 	user, err := s.users.FindByUsername(ctx, req.Username)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, common.WrapAppError(e.CodeInvalidLogin, ErrInvalidLogin)
+		}
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 校验密码
 	if !utils.CheckPassword(req.Password, user.PasswordHash) {
-		return nil, ErrInvalidLogin
+		return nil, common.WrapAppError(e.CodeInvalidLogin, ErrInvalidLogin)
 	}
 
 	// 生成 JWT 令牌
 	token, err := utils.GenerateToken(user.ID, user.Username, s.jwtSecret, s.jwtExpireSeconds)
 	if err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 返回 token 和过期时间

@@ -8,12 +8,16 @@ import (
 	"fmt"
 	"time"
 
+	"Go-AIServiceSupport/common"
+	"Go-AIServiceSupport/common/e"
 	"Go-AIServiceSupport/internal/api/request"
 	"Go-AIServiceSupport/internal/api/response"
 	"Go-AIServiceSupport/internal/cache"
 	"Go-AIServiceSupport/internal/model"
 	"Go-AIServiceSupport/internal/mq"
 	"Go-AIServiceSupport/internal/repository/dao"
+
+	"gorm.io/gorm"
 )
 
 // 全局错误变量：若是无权访问任务错误，则返回ErrTaskForbidden
@@ -51,7 +55,7 @@ func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request
 
 	// 存入数据库
 	if err := s.tasks.Create(ctx, task); err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeTaskSubmitFailed, err)
 	}
 
 	// 发送到消息队列，异步处理
@@ -60,7 +64,7 @@ func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request
 		UserID: userID,
 		Prompt: req.Prompt,
 	}); err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeTaskSubmitFailed, err)
 	}
 
 	// Todo: 将任务加入缓存中，设置状态为 running
@@ -77,18 +81,21 @@ func (s *TaskService) GetTaskStatus(ctx context.Context, userID uint64, taskID s
 	// 根据任务 ID 查询任务信息
 	task, err := s.tasks.FindByTaskID(ctx, taskID)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, common.WrapAppError(e.CodeTaskNotFound, err)
+		}
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 权限校验：只能查询自己的任务
 	if task.UserID != userID {
-		return nil, ErrTaskForbidden
+		return nil, common.WrapAppError(e.CodeForbidden, ErrTaskForbidden)
 	}
 
 	// 从缓存中获取状态
 	status, ok, err := s.statusCache.Get(ctx, taskID)
 	if err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 	if !ok {
 		status = model.TaskStatusPending
