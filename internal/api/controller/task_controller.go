@@ -31,7 +31,7 @@ func (ctl *TaskController) CreateTask(ctx *gin.Context) {
 	// 调用服务层创建任务：传入上下文、当前登录用户ID、请求参数
 	resp, err := ctl.taskService.CreateTask(ctx.Request.Context(), middle.CurrentUserID(ctx), req)
 	if err != nil {
-		common.FailWithMessage(ctx, e.CodeTaskSubmitFailed, err.Error())
+		common.Error(ctx, err)
 		return
 	}
 

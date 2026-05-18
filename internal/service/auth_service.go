@@ -37,7 +37,7 @@ func (s *AuthService) Register(ctx context.Context, req request.RegisterRequest)
 	// 密码加密
 	passwordHash, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 构造用户对象
@@ -48,7 +48,7 @@ func (s *AuthService) Register(ctx context.Context, req request.RegisterRequest)
 
 	// 存储到数据库
 	if err := s.users.Create(ctx, user); err != nil {
-		return nil, err
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 返回结果

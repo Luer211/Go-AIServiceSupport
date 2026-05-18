@@ -31,7 +31,7 @@ func (ctl *AuthController) Register(ctx *gin.Context) {
 	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Register(ctx.Request.Context(), req)
 	if err != nil {
-		common.FailWithMessage(ctx, e.CodeInternalError, err.Error())
+		common.Error(ctx, err)
 		return
 	}
 

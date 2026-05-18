@@ -22,7 +22,7 @@ func (err *AppError) Error() string {
 	return err.Message
 }
 
-// 根据错误码新建一个AppError
+// 根据错误码新建一个AppError：业务层业务规则不通过时使用
 func NewAppError(code int) *AppError {
 	return &AppError{
 		Code: 		code,
@@ -31,7 +31,7 @@ func NewAppError(code int) *AppError {
 	}
 }
 
-// 根据错误码新建一个AppError，但是可自定义错误Message
+// 根据错误码新建一个AppError，但是可自定义错误Message：业务层业务规则不通过时使用
 func NewAppErrorWithMessage(code int, message string) *AppError {
 	return &AppError{
 		Code: 		code,
@@ -45,7 +45,7 @@ func (err *AppError) Unwrap() error {
 	return err.Cause
 }
 
-// 根据底层错误原因新建一个AppError
+// 根据底层错误原因新建一个AppError：业务层涉及到dao等下层出现错误时使用
 func WrapAppError(code int, cause error) *AppError {
 	return &AppError{
 		Code: 		code,
