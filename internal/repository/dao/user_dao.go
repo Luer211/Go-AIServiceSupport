@@ -18,16 +18,18 @@ func NewUserDao(db *gorm.DB) *UserDao {
 
 // 创建新用户
 func (d *UserDao) Create(ctx context.Context, user *model.User) error {
-	return d.db.WithContext(ctx).Create(user).Error
+	err := d.db.WithContext(ctx).Create(user).Error
+	return wrapDBError("create user", err)
 }
 
 // 按照用户名称查询用户
 func (d *UserDao) FindByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
-	if err := d.db.WithContext(ctx).
+	err := d.db.WithContext(ctx).
 		Where("username = ?", username).
-		First(&user).Error; err != nil {
-			return nil, err
-		}
+		First(&user).Error
+	if err != nil {
+		return nil, wrapDBError("find user by username", err)
+	}
 	return &user, nil
 }

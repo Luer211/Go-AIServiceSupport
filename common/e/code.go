@@ -1,5 +1,6 @@
 package e
 
+// 定义错误码
 const (
 	CodeSuccess = 0
 
@@ -17,6 +18,7 @@ const (
 	CodeInternalError = 50000
 )
 
+// 错误码对应的信息说明
 var messages = map[int]string{
 	CodeSuccess:          "success",
 	CodeInvalidParams:    "invalid params",
@@ -31,6 +33,7 @@ var messages = map[int]string{
 	CodeInternalError:    "internal error",
 }
 
+// 错误码转 HTTP 状态码
 func HTTPStatus(code int) int {
 	switch code {
 	case CodeInvalidParams, CodeUserExists, CodeInvalidLogin:
@@ -50,6 +53,7 @@ func HTTPStatus(code int) int {
 	}
 }
 
+// 根据错误码返回错误信息
 func Message(code int) string {
 	if msg, ok := messages[code]; ok {
 		return msg

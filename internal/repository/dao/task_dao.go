@@ -18,17 +18,19 @@ func NewTaskDao(db *gorm.DB) *TaskDao {
 
 // 把任务写入 tasks 表。
 func (d *TaskDao) Create(ctx context.Context, task *model.Task) error {
-	return d.db.WithContext(ctx).Create(task).Error
+	err := d.db.WithContext(ctx).Create(task).Error
+	return wrapDBError("create task", err)
 }
 
 // 按 task_id 查询任务，并用于校验任务归属
 func (d *TaskDao) FindByTaskID(ctx context.Context, taskID string) (*model.Task, error) {
 	var task model.Task
-	if err := d.db.WithContext(ctx).
+	err := d.db.WithContext(ctx).
 		Where("task_id = ?", taskID).
-		First(&task).Error; err != nil {
-			return nil, err
-		}
+		First(&task).Error
+	if err != nil {
+		return nil, wrapDBError("find task by task id", err)
+	}
 	return &task, nil
 }
 
