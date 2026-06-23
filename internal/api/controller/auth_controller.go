@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
 
 	"Go-AIServiceSupport/common"
@@ -50,11 +48,7 @@ func (ctl *AuthController) Login(ctx *gin.Context) {
 	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Login(ctx.Request.Context(), req)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidLogin) {
-			common.Error(ctx, err)
-			return
-		}
-		common.FailWithMessage(ctx, e.CodeInternalError, err.Error())
+		common.Error(ctx, err)
 		return
 	}
 

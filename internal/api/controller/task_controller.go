@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
 
 	"Go-AIServiceSupport/common"
@@ -24,7 +22,7 @@ func NewTaskController(taskService *service.TaskService) *TaskController {
 func (ctl *TaskController) CreateTask(ctx *gin.Context) {
 	var req request.CreateTaskRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		common.Error(ctx, err)
+		common.Fail(ctx, e.CodeInvalidParams)
 		return
 	}
 
@@ -49,13 +47,7 @@ func (ctl *TaskController) GetTaskStatus(ctx *gin.Context) {
 	// 调用服务层查询任务状态：传入上下文、当前登录用户ID、任务ID
 	resp, err := ctl.taskService.GetTaskStatus(ctx.Request.Context(), middle.CurrentUserID(ctx), req.TaskID)
 	if err != nil {
-		// 判断是否为无权限访问错误，若是则返回权限不足响应
-		if errors.Is(err, service.ErrTaskForbidden) {
-			common.Error(ctx, err)
-			return
-		}
-		// 其他错误（如任务不存在），返回任务未找到响应
-		common.FailWithMessage(ctx, e.CodeTaskNotFound, err.Error())
+		common.Error(ctx, err)
 		return
 	}
 
