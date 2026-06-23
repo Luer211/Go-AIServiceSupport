@@ -1,3 +1,5 @@
+// 负责错误在 Go 代码中的表达、包装、传递
+
 package common
 
 import (
@@ -13,7 +15,6 @@ type AppError struct {
 	Cause      error
 }
 
-//Todo: 这个似乎是不会被使用的。实现了接口而已。
 func (err *AppError) Error() string {
 	if err.Cause != nil {
 		return  err.Cause.Error()
@@ -22,7 +23,7 @@ func (err *AppError) Error() string {
 	return err.Message
 }
 
-// 根据错误码新建一个AppError：业务层业务规则不通过时使用
+// 根据错误码新建一个AppError：service层业务规则不通过时使用
 func NewAppError(code int) *AppError {
 	return &AppError{
 		Code: 		code,
@@ -31,7 +32,7 @@ func NewAppError(code int) *AppError {
 	}
 }
 
-// 根据错误码新建一个AppError，但是可自定义错误Message：业务层业务规则不通过时使用
+// 根据错误码新建一个AppError，但是可自定义错误Message：service层业务规则不通过时使用
 func NewAppErrorWithMessage(code int, message string) *AppError {
 	return &AppError{
 		Code: 		code,
@@ -45,7 +46,7 @@ func (err *AppError) Unwrap() error {
 	return err.Cause
 }
 
-// 根据底层错误原因新建一个AppError：业务层涉及到dao等下层出现错误时使用
+// 根据底层错误原因新建一个AppError：service层涉及到dao等下层出现错误时使用
 func WrapAppError(code int, cause error) *AppError {
 	return &AppError{
 		Code: 		code,
@@ -55,7 +56,7 @@ func WrapAppError(code int, cause error) *AppError {
 	}
 }
 
-// 从error中取出AppError（控制层使用）
+// 从error中取出AppError（controller层使用）
 func AsAppError(err error) (*AppError, bool) {
 	var appErr *AppError
 	if errors.As(err, &appErr) {

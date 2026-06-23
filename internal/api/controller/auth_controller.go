@@ -29,7 +29,7 @@ func (ctl *AuthController) Register(ctx *gin.Context) {
 	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Register(ctx.Request.Context(), req)
 	if err != nil {
-		common.Error(ctx, err)
+		common.ErrorResponse(ctx, err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (ctl *AuthController) Login(ctx *gin.Context) {
 	// 调用服务层处理业务逻辑
 	resp, err := ctl.authService.Login(ctx.Request.Context(), req)
 	if err != nil {
-		common.Error(ctx, err)
+		common.ErrorResponse(ctx, err)
 		return
 	}
 

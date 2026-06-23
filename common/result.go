@@ -1,3 +1,5 @@
+// 负责把错误转换成 HTTP 响应
+
 package common
 
 import (
@@ -25,11 +27,11 @@ func Success(c *gin.Context, data interface{}) {
 }
 
 // 失败响应
-func Error(c *gin.Context, err error) {
+func ErrorResponse(c *gin.Context, err error) {
 	// 假如是定义的AppError的话
 	if appErr, ok := AsAppError(err); ok {
 		c.JSON(appErr.HTTPStatus, Response{
-			Code: 	 appErr.Code,
+			Code:    appErr.Code,
 			Message: appErr.Message,
 		})
 		return
@@ -37,17 +39,18 @@ func Error(c *gin.Context, err error) {
 
 	// 假如是普通的error的话
 	c.JSON(http.StatusInternalServerError, Response{
-		Code: 	 e.CodeInternalError,
+		Code:    e.CodeInternalError,
 		Message: e.Message(e.CodeInternalError),
 	})
 }
 
-// 控制层发生错误的话用Fail和FailWithMessage
+// controller层发生错误的话用Fail和FailWithMessage
+// 然后这里也是会通通转到 Error() 的
 
 func Fail(c *gin.Context, code int) {
-	Error(c, NewAppError(code))
+	ErrorResponse(c, NewAppError(code))
 }
 
 func FailWithMessage(c *gin.Context, code int, message string) {
-	Error(c, NewAppErrorWithMessage(code, message))
+	ErrorResponse(c, NewAppErrorWithMessage(code, message))
 }
