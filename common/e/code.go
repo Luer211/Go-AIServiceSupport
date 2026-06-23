@@ -14,6 +14,7 @@ const (
 	CodeInvalidLogin     = 40002
 	CodeTaskNotFound     = 40003
 	CodeTaskSubmitFailed = 50001
+	CodeTaskWriteInRedisFailed = 50002
 
 	CodeInternalError = 50000
 )
@@ -30,6 +31,7 @@ var messages = map[int]string{
 	CodeInvalidLogin:     "invalid username or password",
 	CodeTaskNotFound:     "task not found",
 	CodeTaskSubmitFailed: "task submit failed",
+	CodeTaskWriteInRedisFailed: "task write in redis failed",
 	CodeInternalError:    "internal error",
 }
 
@@ -46,7 +48,7 @@ func HTTPStatus(code int) int {
 		return 404
 	case CodeTooManyReq:
 		return 429
-	case CodeInternalError, CodeTaskSubmitFailed:
+	case CodeInternalError, CodeTaskSubmitFailed, CodeTaskWriteInRedisFailed:
 		return 500
 	default:
 		return 500

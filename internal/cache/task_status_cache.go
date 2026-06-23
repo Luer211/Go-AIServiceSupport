@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"fmt"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -29,14 +30,16 @@ func (c *TaskStatusCache) Get(ctx context.Context, taskID string) (string, bool,
 		return "", false, nil
 	}
 
-	status, err := c.client.Get(ctx, TaskStatusKey(taskID)).Result()
+	key := TaskStatusKey(taskID)
+
+	status, err := c.client.Get(ctx, key).Result()
 	if err != nil {
 		// key 不存在
 		if errors.Is(err, redis.Nil) {
 			return "", false, nil
 		}
 		// 其他错误
-		return "", false, err
+		return "", false, fmt.Errorf("get task status from redis: %w", err)
 	}
 
 	return status, true, nil

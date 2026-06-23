@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Todo: 这里要明确一下，我们已经严肃设计了DB和Redis了，就不应该是any了
 var (
 	Config       *config.Config
 	DB           *gorm.DB

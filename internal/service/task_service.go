@@ -40,7 +40,7 @@ func NewTaskService(tasks *dao.TaskDao, statusCache *cache.TaskStatusCache, prod
 }
 
 // 创建任务
-// 流程：生成任务ID → 保存到数据库 → 发送到消息队列 → 存入缓存中running → 返回任务信息
+// 流程：生成任务ID → 保存到数据库 → 发送到消息队列 → 存入缓存中pending → 返回任务信息
 func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request.CreateTaskRequest) (*response.CreateTaskResponse, error) {
 	// 创建任务
 	taskID := newTaskID()
@@ -68,7 +68,14 @@ func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request
 		return nil, common.WrapAppError(e.CodeTaskSubmitFailed, err)
 	}
 
-	// Todo: 将任务加入缓存中，设置状态为 running
+	// 将任务加入缓存中，设置状态为 pending
+	if err := s.statusCache.Set(
+		ctx,
+		taskID,
+		model.TaskStatusPending,
+	); err != nil {
+		return nil, common.WrapAppError(e.CodeTaskWriteInRedisFailed, err)
+	}
 
 	return &response.CreateTaskResponse{
 		TaskID: taskID,
@@ -98,8 +105,9 @@ func (s *TaskService) GetTaskStatus(ctx context.Context, userID uint64, taskID s
 	if err != nil {
 		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
+	// 如果没有，先用 MySQL 里面查询出来的
 	if !ok {
-		status = model.TaskStatusPending
+		status = task.Status
 	}
 
 	return &response.GetTaskStatusResponse{
@@ -108,7 +116,7 @@ func (s *TaskService) GetTaskStatus(ctx context.Context, userID uint64, taskID s
 	}, nil
 }
 
-// 创建任务ID的工具函数
+// 创建任务ID的工具函数：随机生成ID
 func newTaskID() string {
 	buf := make([]byte, 16)
 	if _, err := rand.Read(buf); err != nil {

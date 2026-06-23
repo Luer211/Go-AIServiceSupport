@@ -1,3 +1,5 @@
+// 安装全局依赖
+
 package initialize
 
 import (

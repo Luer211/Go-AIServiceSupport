@@ -24,6 +24,7 @@ type RabbitMQProducer struct {
 	mu         sync.Mutex
 }
 
+// 初始化一个可以向 RabbitMQ 发送任务消息的 Producer
 func NewRabbitMQProducer(url, exchange, queue, routingKey string) (*RabbitMQProducer, error) {
 	conn, err := amqp.Dial(url)
 	if err != nil {
@@ -62,6 +63,7 @@ func NewRabbitMQProducer(url, exchange, queue, routingKey string) (*RabbitMQProd
 	}, nil
 }
 
+// 向 MQ 中提交一个任务
 func (p *RabbitMQProducer) PublishTask(ctx context.Context, message TaskMessage) error {
 	body, err := json.Marshal(message)
 	if err != nil {
