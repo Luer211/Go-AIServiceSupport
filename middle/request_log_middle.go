@@ -9,6 +9,7 @@ import (
 	"Go-AIServiceSupport/global"
 )
 
+// 在每次请求处理完成后记录一条访问日志
 func RequestLog() gin.HandlerFunc {
 	return  func(c *gin.Context) {
 		start := time.Now()

@@ -12,6 +12,7 @@ import (
 	"Go-AIServiceSupport/global"
 )
 
+// 捕获请求处理过程中未处理的 panic，防止整个服务进程崩溃
 func RecoveryLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

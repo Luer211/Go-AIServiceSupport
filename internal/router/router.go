@@ -14,10 +14,10 @@ import (
 )
 
 func InitRouter() *gin.Engine {
-	r := gin.Default()
+	r := gin.New()
 	
-	r.Use(middle.RecoveryLog())
 	r.Use(middle.RequestLog())
+	r.Use(middle.RecoveryLog())
 
 	cfg := global.AppConfig()
 	producer := global.TaskProducer

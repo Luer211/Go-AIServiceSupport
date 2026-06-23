@@ -28,7 +28,10 @@ func Success(c *gin.Context, data interface{}) {
 
 // 失败响应
 func ErrorResponse(c *gin.Context, err error) {
-	// 假如是定义的AppError的话
+	// 错误塞进 c.Errors 供中间件使用
+	_ = c.Error(err)
+
+	// 响应
 	if appErr, ok := AsAppError(err); ok {
 		c.JSON(appErr.HTTPStatus, Response{
 			Code:    appErr.Code,
@@ -36,12 +39,6 @@ func ErrorResponse(c *gin.Context, err error) {
 		})
 		return
 	}
-
-	// 假如是普通的error的话
-	c.JSON(http.StatusInternalServerError, Response{
-		Code:    e.CodeInternalError,
-		Message: e.Message(e.CodeInternalError),
-	})
 }
 
 // controller层发生错误的话用Fail和FailWithMessage
