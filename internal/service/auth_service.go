@@ -11,8 +11,6 @@ import (
 	"Go-AIServiceSupport/internal/api/response"
 	"Go-AIServiceSupport/internal/model"
 	"Go-AIServiceSupport/internal/repository/dao"
-
-	"gorm.io/gorm"
 )
 
 // 全局错误变量：用户名不存在/密码错误 时返回这个错误
@@ -48,6 +46,9 @@ func (s *AuthService) Register(ctx context.Context, req request.RegisterRequest)
 
 	// 存储到数据库
 	if err := s.users.Create(ctx, user); err != nil {
+		if errors.Is(err, dao.ErrAlreadyExists) {
+			return nil, common.WrapAppError(e.CodeUserExists, err)
+		}
 		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
@@ -63,7 +64,7 @@ func (s *AuthService) Login(ctx context.Context, req request.LoginRequest) (*res
 	// 根据用户名查询用户
 	user, err := s.users.FindByUsername(ctx, req.Username)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, dao.ErrNotFound) {
 			return nil, common.WrapAppError(e.CodeInvalidLogin, ErrInvalidLogin)
 		}
 		return nil, common.WrapAppError(e.CodeInternalError, err)

@@ -16,8 +16,6 @@ import (
 	"Go-AIServiceSupport/internal/model"
 	"Go-AIServiceSupport/internal/mq"
 	"Go-AIServiceSupport/internal/repository/dao"
-
-	"gorm.io/gorm"
 )
 
 // 全局错误变量：若是无权访问任务错误，则返回ErrTaskForbidden
@@ -55,7 +53,10 @@ func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request
 
 	// 存入数据库
 	if err := s.tasks.Create(ctx, task); err != nil {
-		return nil, common.WrapAppError(e.CodeTaskSubmitFailed, err)
+		if errors.Is(err, dao.ErrAlreadyExists) {
+			return nil, common.WrapAppError(e.CodeTaskSubmitFailed, err)
+		}
+		return nil, common.WrapAppError(e.CodeInternalError, err)
 	}
 
 	// 发送到消息队列，异步处理
@@ -81,7 +82,7 @@ func (s *TaskService) GetTaskStatus(ctx context.Context, userID uint64, taskID s
 	// 根据任务 ID 查询任务信息
 	task, err := s.tasks.FindByTaskID(ctx, taskID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, dao.ErrNotFound) {
 			return nil, common.WrapAppError(e.CodeTaskNotFound, err)
 		}
 		return nil, common.WrapAppError(e.CodeInternalError, err)
