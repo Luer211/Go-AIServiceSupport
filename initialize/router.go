@@ -6,6 +6,6 @@ import (
 	"Go-AIServiceSupport/internal/router"
 )
 
-func InitRouter() *gin.Engine {
+func InitRouter() (*gin.Engine, error) {
 	return router.InitRouter()
 }
