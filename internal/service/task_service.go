@@ -27,16 +27,22 @@ type TaskService struct {
 	producer    mq.Producer
 }
 
-// Todo：这里的错误处理
-func NewTaskService(tasks *dao.TaskDao, statusCache *cache.TaskStatusCache, producer mq.Producer) *TaskService {
-	if producer == nil {
-		panic("task producer not initialized")
+func NewTaskService(tasks *dao.TaskDao, statusCache *cache.TaskStatusCache, producer mq.Producer) (*TaskService, error) {
+	if tasks == nil {
+		return nil, fmt.Errorf("task dao is required")
 	}
+	if statusCache == nil {
+		return nil, fmt.Errorf("task status cache is required")
+	}
+	if producer == nil {
+		return nil, fmt.Errorf("task producer is required")
+	}
+
 	return &TaskService{
 		tasks:       tasks,
 		statusCache: statusCache,
 		producer:    producer,
-	}
+	}, nil
 }
 
 // 创建任务
@@ -84,7 +90,7 @@ func (s *TaskService) CreateTask(ctx context.Context, userID uint64, req request
 }
 
 // 查询任务状态
-// 流程：查询任务 → 校验权限 → 从缓存获取状态 → 返回结果
+// 流程：查询任务 → 校验权限 → 从缓存获取状态 → 若缓存没有则从数据库中取状态 → 返回结果
 func (s *TaskService) GetTaskStatus(ctx context.Context, userID uint64, taskID string) (*response.GetTaskStatusResponse, error) {
 	// 根据任务 ID 查询任务信息
 	task, err := s.tasks.FindByTaskID(ctx, taskID)
