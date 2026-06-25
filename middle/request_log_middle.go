@@ -13,15 +13,21 @@ import (
 func RequestLog() gin.HandlerFunc {
 	return  func(c *gin.Context) {
 		start := time.Now()
+		
+		// 把 requestID 写进 gin.Context 里面
+		requestID := ensureRequestID(c)
 
 		c.Next()
 
 		latency := time.Since(start)
 		userID := CurrentUserID(c)
+		status := c.Writer.Status()
 
 		fields := []zap.Field{
+			zap.String("request_id", requestID),
 			zap.String("method", c.Request.Method),
 			zap.String("path", c.Request.URL.Path),
+			zap.String("route", c.FullPath()),
 			zap.Int("status", c.Writer.Status()),
 			zap.Duration("latency", latency),
 			zap.Int64("latency_ms", latency.Milliseconds()),
@@ -33,16 +39,17 @@ func RequestLog() gin.HandlerFunc {
 			fields = append(fields, zap.Uint64("user_id", userID))
 		}
 
-		// Todo: 按不同情况输出不同级别的日志，目前这些是示例
-		// 后面可能想要细分成就是说，不同的业务错误码，需要不同的错误？
-		// 然后还有一个就是说，我们的HTTP状态码目前设计有问题，全部响应是200，这是不对的
-
 		if len(c.Errors) > 0 {
 			fields = append(fields, zap.String("errors", c.Errors.String()))
-			global.Log.Error("request completed with errors", fields...)
-			return
 		}
 
-		global.Log.Info("request completed", fields...)
+		switch {
+		case status >= 500:
+			global.Log.Error("request completed", fields...)
+		case status >= 400:
+			global.Log.Warn("request completed", fields...)
+		default:
+			global.Log.Info("request completed", fields...)
+		}
 	}
 }
