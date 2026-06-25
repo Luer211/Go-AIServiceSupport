@@ -11,10 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitGorm(
-	ctx context.Context,
-	cfg *config.Config,
-) (*gorm.DB, error) {
+func InitGorm(ctx context.Context, cfg *config.Config,) (*gorm.DB, error) {
 	db, err := gorm.Open(
 		mysql.Open(cfg.MySQL.DSN),
 		&gorm.Config{},

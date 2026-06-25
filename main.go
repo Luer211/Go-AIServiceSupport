@@ -16,6 +16,8 @@ import (
 	"Go-AIServiceSupport/internal/router"
 )
 
+// Todo: 这一段代码涉及了 channel、goroutine、context，是学习的好资料。
+
 func main() {
 	if err := run(); err != nil {
 		log.Printf("application stopped: %v", err)
@@ -24,6 +26,7 @@ func main() {
 }
 
 func run() (err error) {
+	// 创建可被系统信号取消的根 Context
 	ctx, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
@@ -47,6 +50,7 @@ func run() (err error) {
 		return fmt.Errorf("initialize router: %w", err)
 	}
 
+	// 用标准库 http.Server 承载 Gin engine
 	server := &http.Server{
 		Addr:    ":" + global.AppConfig().Server.Port,
 		Handler: engine,
@@ -54,10 +58,12 @@ func run() (err error) {
 
 	serverErr := make(chan error, 1)
 
+	// HTTP 服务是阻塞式的，所以放到 goroutine 中运行
 	go func() {
 		serverErr <- server.ListenAndServe()
 	}()
 
+	// 等待：服务异常退出，或者收到系统终止信号
 	select {
 	case err := <-serverErr:
 		if errors.Is(err, http.ErrServerClosed) {
